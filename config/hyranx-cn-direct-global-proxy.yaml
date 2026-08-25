@@ -2,34 +2,35 @@ mode: rule
 log-level: info
 
 # MiSub injects the current subscription nodes into this profile at generation time.
+# Only node names tagged as Singapore can reach non-China destinations.
 proxy-groups:
   - name: PROXY
     type: select
     proxies:
-      - AUTO
-      - FALLBACK
-      - MANUAL
-      - DIRECT
+      - SG-FAILOVER
+      - SG-MANUAL
+    default-selected: SG-FAILOVER
 
-  - name: AUTO
-    type: url-test
-    include-all: true
-    exclude-type: direct
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    tolerance: 50
-
-  - name: FALLBACK
+  # Default: retain the current Singapore exit until it fails, then move to
+  # the first healthy Singapore candidate. It never selects by lowest latency.
+  - name: SG-FAILOVER
     type: fallback
     include-all: true
     exclude-type: direct
+    filter: '(?i)(新加坡|singapore|🇸🇬)'
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1800
+    timeout: 5000
+    max-failed-times: 3
+    lazy: true
 
-  - name: MANUAL
+  # Optional override: use only when you intentionally want to pin one
+  # Singapore node and accept manual recovery if that node fails.
+  - name: SG-MANUAL
     type: select
     include-all: true
     exclude-type: direct
+    filter: '(?i)(新加坡|singapore|🇸🇬)'
 
 rule-providers:
   private-network:
