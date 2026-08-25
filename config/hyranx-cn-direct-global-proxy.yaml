@@ -1,0 +1,55 @@
+mode: rule
+log-level: info
+
+# MiSub injects the current subscription nodes into this profile at generation time.
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - AUTO
+      - FALLBACK
+      - MANUAL
+      - DIRECT
+
+  - name: AUTO
+    type: url-test
+    include-all: true
+    exclude-type: direct
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  - name: FALLBACK
+    type: fallback
+    include-all: true
+    exclude-type: direct
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+
+  - name: MANUAL
+    type: select
+    include-all: true
+    exclude-type: direct
+
+rule-providers:
+  private-network:
+    type: http
+    behavior: classical
+    format: text
+    path: ./ruleset/private-network.list
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/433381ebc4b1de59350fa8bed2a04a888228f801/Clash/LocalAreaNetwork.list
+    interval: 86400
+
+  china-domain:
+    type: http
+    behavior: classical
+    format: text
+    path: ./ruleset/china-domain.list
+    url: https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/433381ebc4b1de59350fa8bed2a04a888228f801/Clash/ChinaDomain.list
+    interval: 86400
+
+rules:
+  - RULE-SET,private-network,DIRECT
+  - RULE-SET,china-domain,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
