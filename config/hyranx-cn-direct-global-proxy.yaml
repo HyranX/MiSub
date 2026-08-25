@@ -32,6 +32,13 @@ proxy-groups:
     exclude-type: direct
     filter: '(?i)(新加坡|singapore|🇸🇬)'
 
+  # Manual escape hatch only. This group is not referenced by PROXY, so
+  # exposing every node here cannot change the daily Singapore-only route.
+  - name: ALL-NODES
+    type: select
+    include-all: true
+    exclude-type: direct
+
 rule-providers:
   private-network:
     type: http
