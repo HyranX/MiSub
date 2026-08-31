@@ -57,6 +57,11 @@ rule-providers:
     interval: 86400
 
 rules:
+  # Keep Tailnet traffic out of the system HTTP proxy and Mihomo proxy nodes.
+  # These rules must remain above the generic private/China rules and MATCH.
+  - DOMAIN-SUFFIX,tailae5ed6.ts.net,DIRECT
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR6,fd7a:115c:a1e0::/48,DIRECT,no-resolve
   - RULE-SET,private-network,DIRECT
   - RULE-SET,china-domain,DIRECT
   - GEOIP,CN,DIRECT
