@@ -2,13 +2,15 @@ mode: rule
 log-level: info
 
 # MiSub injects the current subscription nodes into this profile at generation time.
-# Only node names tagged as Singapore can reach non-China destinations.
+# Non-China traffic uses Singapore failover by default. ALL-NODES remains an
+# explicit manual override when an exit in another region is required.
 proxy-groups:
   - name: PROXY
     type: select
     proxies:
       - SG-FAILOVER
       - SG-MANUAL
+      - ALL-NODES
     default-selected: SG-FAILOVER
 
   # Default: retain the current Singapore exit until it fails, then move to
@@ -32,8 +34,8 @@ proxy-groups:
     exclude-type: direct
     filter: '(?i)(新加坡|singapore|🇸🇬)'
 
-  # Manual escape hatch only. This group is not referenced by PROXY, so
-  # exposing every node here cannot change the daily Singapore-only route.
+  # Manual escape hatch: select this group from PROXY, then choose any
+  # imported node. The default route remains SG-FAILOVER.
   - name: ALL-NODES
     type: select
     include-all: true
